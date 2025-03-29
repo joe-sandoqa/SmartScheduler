@@ -2,8 +2,7 @@
 //  ContentView.swift
 //  SmartScheduler
 //
-//  Created by Yousef Sandoqa on 3/25/25.
-//
+//  Created by Yousef Sandoqa and Yosef Pineda
 
 import SwiftUI
 
