@@ -14,6 +14,7 @@ struct SmartSchedulerApp: App {
         NotificationManager.instance.requestAuthorization()
         // Set the delegate so notifications show when the app is in the foreground.
         UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
+        ViewModel().checkTodayIsHolidayAndNotify()
     }
     var body: some Scene {
         WindowGroup {

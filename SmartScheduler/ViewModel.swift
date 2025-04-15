@@ -49,7 +49,6 @@ class ViewModel: ObservableObject {
     }
     
     func updateTask(reminder: Reminder, title: String, desc: String, date: Date, location: String?) {
-        guard let con = con else { return }
         reminder.title = title
         reminder.desc = desc
         reminder.date = date
@@ -64,6 +63,18 @@ class ViewModel: ObservableObject {
             getReminders()
         } catch {
             print("Error saving context: \(error)")
+        }
+    }
+    func checkTodayIsHolidayAndNotify() {
+        HolidayAPIManager.shared.fetchHolidays { holidays in
+            let today = ISO8601DateFormatter().string(from: Date()).prefix(10)
+            //let today = "2025-07-04" //this line is for testing
+            if let holiday = holidays.first(where: { $0.date == today }) {
+                NotificationManager.instance.scheduleNotification(
+                    title: "Today is a holiday!!",
+                    body: "\(holiday.localName) is today!"
+                )
+            }
         }
     }
 }

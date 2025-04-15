@@ -168,8 +168,8 @@ struct AddReminderView: View {
                     DatePicker("Select Date & Time", selection: $date, displayedComponents: [.date, .hourAndMinute])
                     
                     TextField("Enter Location (Optional)", text: $location)
-                        .onChange(of: location) { newValue in
-                            locationCompleter.updateQuery(newValue)
+                        .onChange(of: location) {
+                            locationCompleter.updateQuery(location)
                         }
                     
                     if !locationCompleter.completions.isEmpty && !location.isEmpty {
