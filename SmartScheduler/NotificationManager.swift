@@ -7,10 +7,17 @@
 
 import Foundation
 import UserNotifications
+import CoreLocation
 
-class NotificationManager {
+class NotificationManager: NSObject, CLLocationManagerDelegate {
     static let instance = NotificationManager()
-    private init() {}
+    private let geofenceManager = CLLocationManager()
+    
+    private override init() {
+        super.init()
+        geofenceManager.delegate = self
+        geofenceManager.requestAlwaysAuthorization()
+    }
     
     func requestAuthorization() {
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]
@@ -44,5 +51,26 @@ class NotificationManager {
             }
         }
     }
-}
+    
+    /// Schedule a 100 m geofence around the reminder location
+    func scheduleGeofenceNotification(for reminder: Reminder) {
+        guard let lat = reminder.latitude, let lng = reminder.longitude else { return }
+        let center = CLLocationCoordinate2D(latitude: lat, longitude: lng)
+        let region = CLCircularRegion(center: center, radius: 100, identifier: reminder.title)
+        region.notifyOnEntry = true
+        region.notifyOnExit = false
+        geofenceManager.startMonitoring(for: region)
+    }
 
+    // CLLocationManagerDelegate callback
+    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        let content = UNMutableNotificationContent()
+        content.title = "You're near \(region.identifier)"
+        content.body = "You have a reminder for this location."
+        content.sound = .default
+        let request = UNNotificationRequest(identifier: UUID().uuidString,
+                                            content: content,
+                                            trigger: nil)
+        UNUserNotificationCenter.current().add(request)
+    }
+}

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 import Combine
+import CoreLocation
 
 class ViewModel: ObservableObject {
     @Published var reminders: [Reminder] = []
@@ -77,6 +78,18 @@ class ViewModel: ObservableObject {
             }
         }
     }
+    
+    /// Check and notify for any reminders within ~100 ft of the given coordinate.
+    func checkNearbyReminders(at coordinate: CLLocationCoordinate2D) {
+        guard let ctx = con else { return }
+        // Manual test coordinate:
+        let testCoordinate = CLLocationCoordinate2D(latitude: 33.424564, longitude: -111.928100)
+        LocationReminderChecker.checkAndNotify(context: ctx, currentLocation: testCoordinate)
+        
+        LocationReminderChecker.checkAndNotify(
+            context: ctx,
+            currentLocation: coordinate
+        )
+    }
+
 }
-
-

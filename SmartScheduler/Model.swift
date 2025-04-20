@@ -14,6 +14,8 @@ class Reminder{
     var date: Date
     var desc: String
     var location: String?
+    var latitude: Double?
+    var longitude: Double?
     
     init(title: String, date: Date, desc: String, location: String? = nil) {
         self.title = title

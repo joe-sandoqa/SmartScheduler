@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 @main
 struct SmartSchedulerApp: App {
@@ -15,6 +16,7 @@ struct SmartSchedulerApp: App {
         // Set the delegate so notifications show when the app is in the foreground.
         UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
         ViewModel().checkTodayIsHolidayAndNotify()
+        ViewModel().checkNearbyReminders(at: CLLocationCoordinate2D)
     }
     var body: some Scene {
         WindowGroup {

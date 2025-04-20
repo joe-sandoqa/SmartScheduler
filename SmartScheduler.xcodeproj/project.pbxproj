@@ -10,9 +10,22 @@
 		6B9814E72D92B89B00CC2DF7 /* SmartScheduler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartScheduler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D33304AA2DB3226000A89BC2 /* Exceptions for "SmartScheduler" folder in "SmartScheduler" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 6B9814E62D92B89B00CC2DF7 /* SmartScheduler */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6B9814E92D92B89B00CC2DF7 /* SmartScheduler */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D33304AA2DB3226000A89BC2 /* Exceptions for "SmartScheduler" folder in "SmartScheduler" target */,
+			);
 			path = SmartScheduler;
 			sourceTree = "<group>";
 		};
@@ -255,6 +268,9 @@
 				DEVELOPMENT_ASSET_PATHS = "\"SmartScheduler/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SmartScheduler/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We need background location access to trigger reminders when you arrive at a location.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We use your location when the app is in use to autocomplete addresses and monitor geofences.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -284,6 +300,9 @@
 				DEVELOPMENT_ASSET_PATHS = "\"SmartScheduler/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SmartScheduler/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We need background location access to trigger reminders when you arrive at a location.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We use your location when the app is in use to autocomplete addresses and monitor geofences.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
