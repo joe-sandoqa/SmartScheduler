@@ -9,7 +9,7 @@ import Foundation
 import UserNotifications
 import CoreLocation
 
-class NotificationManager: NSObject, CLLocationManagerDelegate {
+class NotificationManager: NSObject, CLLocationManagerDelegate, UNUserNotificationCenterDelegate {
     static let instance = NotificationManager()
     private let geofenceManager = CLLocationManager()
     
@@ -18,17 +18,7 @@ class NotificationManager: NSObject, CLLocationManagerDelegate {
         geofenceManager.delegate = self
         geofenceManager.requestAlwaysAuthorization()
     }
-    
-    func requestAuthorization() {
-        let options: UNAuthorizationOptions = [.alert, .sound, .badge]
-        UNUserNotificationCenter.current().requestAuthorization(options: options) { success, error in
-            if let error = error {
-                print("Error requesting notification permission: \(error.localizedDescription)")
-            } else {
-                print("Notification permission granted? \(success)")
-            }
-        }
-    }
+
     
     func scheduleNotification(title: String, body: String) {
         let content = UNMutableNotificationContent()
@@ -72,5 +62,67 @@ class NotificationManager: NSObject, CLLocationManagerDelegate {
                                             content: content,
                                             trigger: nil)
         UNUserNotificationCenter.current().add(request)
+    }
+    func scheduleTimedNotification(for reminder: Reminder) {
+        let date = reminder.date
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Reminder: \(reminder.title)"
+        content.body = reminder.desc
+        content.sound = .default
+
+        let triggerDate = Calendar.current.dateComponents(
+            [.year, .month, .day, .hour, .minute],
+            from: date
+        )
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
+
+        let request = UNNotificationRequest(
+            identifier: "timedReminder_\(reminder.id)",
+            content: content,
+            trigger: trigger
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling timed reminder: \(error.localizedDescription)")
+            }
+        }
+    }
+    func requestAuthorization() {
+        let options: UNAuthorizationOptions = [.alert, .sound, .badge]
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: options) { success, error in
+            if let error = error {
+                print("Error requesting notification permission: \(error.localizedDescription)")
+            } else {
+                print("Notification permission granted? \(success)")
+            }
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                if settings.authorizationStatus == .authorized {
+                    print("Notification permissions granted.")
+                } else {
+                    print("Notification permissions not granted.")
+                }
+            }
+        }
+    }
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                            willPresent notification: UNNotification,
+                            withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.banner, .sound])
+    }
+    func checkLocationPermissions() {
+        let status = geofenceManager.authorizationStatus
+        switch status {
+        case .notDetermined, .restricted, .denied:
+            print("Location permissions not granted")
+            // Handle this case - maybe prompt user again
+        case .authorizedAlways, .authorizedWhenInUse:
+            print("Location permissions granted")
+        @unknown default:
+            print("Unknown location authorization status")
+        }
     }
 }

@@ -7,21 +7,35 @@
 
 import SwiftUI
 import MapKit
+import SwiftData
 
 @main
 struct SmartSchedulerApp: App {
+    let container: ModelContainer
     init() {
-        // Request notification permission
+        let schema = Schema([Reminder.self])
+        container = try! ModelContainer(for: schema)
         NotificationManager.instance.requestAuthorization()
-        // Set the delegate so notifications show when the app is in the foreground.
         UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
         ViewModel().checkTodayIsHolidayAndNotify()
-        ViewModel().checkNearbyReminders(at: CLLocationCoordinate2D)
+        let context = container.mainContext
+        registerGeofencesForSavedReminders(context: context)
     }
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .modelContainer(for: [Reminder.self])
+                .modelContainer(container)
+        }
+    }
+    func registerGeofencesForSavedReminders(context: ModelContext) {
+        do {
+            let reminders = try context.fetch(FetchDescriptor<Reminder>())
+            for reminder in reminders {
+                NotificationManager.instance.scheduleGeofenceNotification(for: reminder)
+                NotificationManager.instance.scheduleTimedNotification(for: reminder)
+            }
+        } catch {
+            print("Error fetching reminders on app launch: \(error)")
         }
     }
 }
