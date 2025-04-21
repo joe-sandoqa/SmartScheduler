@@ -9,33 +9,23 @@ import Foundation
 import SwiftData
 import Combine
 import CoreLocation
-
 class ViewModel: ObservableObject {
     @Published var reminders: [Reminder] = []
-    
-    /// Reminders whose date is now or in the future
-    var upcomingReminders: [Reminder] {
+        var upcomingReminders: [Reminder] {
         reminders
             .filter { $0.date >= Date() }
             .sorted { $0.date < $1.date }
     }
-
-    /// Reminders whose date has passed
     var oldReminders: [Reminder] {
         reminders
             .filter { $0.date < Date() }
             .sorted { $0.date > $1.date }
     }
-    
     private var con: ModelContext?
-    
-    // No-argument initializer to support @StateObject
     init() { }
-    
     func setContext(context: ModelContext) {
         self.con = context
     }
-    
     func getReminders() {
         guard let con = con else { return }
         do {
@@ -44,16 +34,12 @@ class ViewModel: ObservableObject {
             print("Error fetching reminders: \(error)")
         }
     }
-    
     func addReminder(title: String, desc: String, date: Date, location: String?) {
         guard let con = con else { return }
         let newReminder = Reminder(title: title, date: date, desc: desc, location: location)
         con.insert(newReminder)
         saveContext()
-        
-        // Schedule a time-based notification
         NotificationManager.instance.scheduleTimedNotification(for: newReminder)
-
         let fmtDate = DateFormatter.localizedString(
             from: date,
             dateStyle: .short,
@@ -63,16 +49,13 @@ class ViewModel: ObservableObject {
             title: "Reminder Created",
             body: "\(title) set for \(fmtDate)"
         )
-        // Start monitoring the reminder’s location
         NotificationManager.instance.scheduleGeofenceNotification(for: newReminder)
     }
-    
     func deleteTask(reminder: Reminder) {
         guard let con = con else { return }
         con.delete(reminder)
         saveContext()
     }
-    
     func updateTask(reminder: Reminder, title: String, desc: String, date: Date, location: String?) {
         reminder.title = title
         reminder.desc = desc
@@ -80,7 +63,6 @@ class ViewModel: ObservableObject {
         reminder.location = location
         saveContext()
     }
-    
     private func saveContext() {
         guard let con = con else { return }
         do {
@@ -102,7 +84,6 @@ class ViewModel: ObservableObject {
             }
         }
     }
-    
     func checkNearbyReminders(at coordinate: CLLocationCoordinate2D) {
         guard let ctx = con else { return }
         LocationReminderChecker.checkAndNotify(
@@ -110,5 +91,4 @@ class ViewModel: ObservableObject {
             currentLocation: coordinate
         )
     }
-
 }

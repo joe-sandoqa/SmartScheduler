@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftData
-
 @Model
 class Reminder{
     var title: String
@@ -16,7 +15,6 @@ class Reminder{
     var location: String?
     var latitude: Double?
     var longitude: Double?
-    
     init(title: String, date: Date, desc: String, location: String? = nil) {
         self.title = title
         self.desc = desc

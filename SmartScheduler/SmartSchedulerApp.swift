@@ -9,7 +9,6 @@ import SwiftUI
 import MapKit
 import SwiftData
 import UserNotifications
-
 @main
 struct SmartSchedulerApp: App {
     let container: ModelContainer

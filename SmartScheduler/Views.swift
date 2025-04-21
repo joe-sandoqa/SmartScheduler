@@ -10,8 +10,6 @@ import SwiftUI
 import SwiftData
 import MapKit
 import CoreLocation
-
-//Location Manager
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
     
@@ -21,12 +19,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         locationManager.requestWhenInUseAuthorization()
     }
 }
-
-//Location Completer
 class LocationCompleter: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
     @Published var completions: [MKLocalSearchCompletion] = []
     private var completer: MKLocalSearchCompleter
-    
     override init() {
         completer = MKLocalSearchCompleter()
         super.init()
@@ -42,24 +37,19 @@ class LocationCompleter: NSObject, ObservableObject, MKLocalSearchCompleterDeleg
             self.completions = completer.results
         }
     }
-    
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print("Error in location completer: \(error.localizedDescription)")
     }
 }
-
-//MainView
 struct MainView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = ViewModel()
     @State private var showingAddReminder = false
-    
     var body: some View {
         NavigationView {
             ZStack {
                 Color("BackgroundColor")
                     .ignoresSafeArea()
-                
                 VStack {
                     if viewModel.reminders.isEmpty {
                         Text("No reminders found.")
@@ -78,7 +68,6 @@ struct MainView: View {
                                     toDelete.forEach { viewModel.deleteTask(reminder: $0) }
                                 }
                             }
-
                             if !viewModel.oldReminders.isEmpty {
                                 Section("Old Reminders") {
                                     ForEach(viewModel.oldReminders, id: \.self) { reminder in
@@ -117,7 +106,6 @@ struct MainView: View {
             viewModel.getReminders()
         }
     }
-    
     private func deleteReminder(at offsets: IndexSet) {
         for index in offsets {
             let reminder = viewModel.reminders[index]
@@ -125,11 +113,8 @@ struct MainView: View {
         }
     }
 }
-
-//ReminderCardView
 struct ReminderCardView: View {
     var reminder: Reminder
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(reminder.title)
@@ -161,19 +146,15 @@ struct ReminderCardView: View {
         .padding(.vertical, 4)
     }
 }
-
-//AddReminderView with Location Autocomplete
 struct AddReminderView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var viewModel: ViewModel
     @StateObject private var locationManager = LocationManager()
     @StateObject private var locationCompleter = LocationCompleter()
-    
     @State private var title: String = ""
     @State private var desc: String = ""
     @State private var date: Date = Date()
     @State private var location: String = ""
-    
     var body: some View {
         NavigationView {
             Form {
@@ -190,7 +171,6 @@ struct AddReminderView: View {
                         .onChange(of: location) {
                             locationCompleter.updateQuery(location)
                         }
-                    
                     if !locationCompleter.completions.isEmpty && !location.isEmpty {
                         List(locationCompleter.completions, id: \.self) { completion in
                             VStack(alignment: .leading) {
@@ -231,22 +211,17 @@ struct AddReminderView: View {
         }
     }
 }
-
-//Date Formatter
 private let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .medium
     formatter.timeStyle = .short
     return formatter
 }()
-
-//Previews
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         MainView()
     }
 }
-
 struct AddReminderView_Previews: PreviewProvider {
     static var previews: some View {
         AddReminderView(viewModel: ViewModel())

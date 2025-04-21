@@ -8,11 +8,9 @@
 import Foundation
 import UserNotifications
 import CoreLocation
-
 class NotificationManager: NSObject, CLLocationManagerDelegate, UNUserNotificationCenterDelegate {
     static let instance = NotificationManager()
     private let geofenceManager = CLLocationManager()
-    
     private override init() {
         super.init()
         geofenceManager.delegate = self
@@ -20,8 +18,6 @@ class NotificationManager: NSObject, CLLocationManagerDelegate, UNUserNotificati
         geofenceManager.allowsBackgroundLocationUpdates = true
         geofenceManager.pausesLocationUpdatesAutomatically = false
     }
-
-    
     func scheduleImmediateNotification(title: String, body: String) {
         let content = UNMutableNotificationContent()
         content.title = title
@@ -42,9 +38,7 @@ class NotificationManager: NSObject, CLLocationManagerDelegate, UNUserNotificati
             }
         }
     }
-    
-    /// Schedule a 100 m geofence around the reminder location
-    func scheduleGeofenceNotification(for reminder: Reminder) {
+        func scheduleGeofenceNotification(for reminder: Reminder) {
         guard let lat = reminder.latitude, let lng = reminder.longitude else { return }
         let center = CLLocationCoordinate2D(latitude: lat, longitude: lng)
         let region = CLCircularRegion(center: center, radius: 100, identifier: reminder.title)
@@ -52,8 +46,6 @@ class NotificationManager: NSObject, CLLocationManagerDelegate, UNUserNotificati
         region.notifyOnExit = false
         geofenceManager.startMonitoring(for: region)
     }
-
-    // CLLocationManagerDelegate callback
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         let content = UNMutableNotificationContent()
         content.title = "You're near \(region.identifier)"
@@ -76,15 +68,12 @@ class NotificationManager: NSObject, CLLocationManagerDelegate, UNUserNotificati
             [.year, .month, .day, .hour, .minute],
             from: date
         )
-        
         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
-
         let request = UNNotificationRequest(
             identifier: "timedReminder_\(reminder.id)",
             content: content,
             trigger: trigger
         )
-
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
                 print("Error scheduling timed reminder: \(error.localizedDescription)")

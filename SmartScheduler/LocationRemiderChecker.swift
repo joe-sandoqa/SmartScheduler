@@ -9,7 +9,6 @@ import Foundation
 import SwiftData
 import CoreLocation
 import UserNotifications
-
 class LocationReminderChecker {
     static let thresholdDistance: Double = 30.48
     static func checkAndNotify(context: ModelContext, currentLocation: CLLocationCoordinate2D) {
