@@ -6,6 +6,8 @@
     <string>We use your location when the app is in use to autocomplete addresses and monitor geofences.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>We need background location access to trigger reminders when you arrive at a location.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>We need background location access to trigger your reminders when you approach their locations.</string>
     <key>UIBackgroundModes</key>
     <array>
         <string>location</string>

@@ -67,12 +67,31 @@ struct MainView: View {
                             .padding()
                     } else {
                         List {
-                            ForEach(viewModel.reminders, id: \.self) { reminder in
-                                ReminderCardView(reminder: reminder)
-                                    .listRowSeparator(.hidden)
-                                    .listRowBackground(Color.clear)
+                            Section("Upcoming Reminders") {
+                                ForEach(viewModel.upcomingReminders, id: \.self) { reminder in
+                                    ReminderCardView(reminder: reminder)
+                                        .listRowSeparator(.hidden)
+                                        .listRowBackground(Color.clear)
+                                }
+                                .onDelete { idx in
+                                    let toDelete = idx.map { viewModel.upcomingReminders[$0] }
+                                    toDelete.forEach { viewModel.deleteTask(reminder: $0) }
+                                }
                             }
-                            .onDelete(perform: deleteReminder)
+
+                            if !viewModel.oldReminders.isEmpty {
+                                Section("Old Reminders") {
+                                    ForEach(viewModel.oldReminders, id: \.self) { reminder in
+                                        ReminderCardView(reminder: reminder)
+                                            .listRowSeparator(.hidden)
+                                            .listRowBackground(Color.clear)
+                                    }
+                                    .onDelete { idx in
+                                        let toDelete = idx.map { viewModel.oldReminders[$0] }
+                                        toDelete.forEach { viewModel.deleteTask(reminder: $0) }
+                                    }
+                                }
+                            }
                         }
                         .listStyle(PlainListStyle())
                     }
@@ -233,4 +252,3 @@ struct AddReminderView_Previews: PreviewProvider {
         AddReminderView(viewModel: ViewModel())
     }
 }
-

@@ -17,16 +17,17 @@ class NotificationManager: NSObject, CLLocationManagerDelegate, UNUserNotificati
         super.init()
         geofenceManager.delegate = self
         geofenceManager.requestAlwaysAuthorization()
+        geofenceManager.allowsBackgroundLocationUpdates = true
+        geofenceManager.pausesLocationUpdatesAutomatically = false
     }
 
     
-    func scheduleNotification(title: String, body: String) {
+    func scheduleImmediateNotification(title: String, body: String) {
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
-        
-        // Trigger after 1 second for an immediate notification.
+
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         
         let request = UNNotificationRequest(
@@ -118,7 +119,6 @@ class NotificationManager: NSObject, CLLocationManagerDelegate, UNUserNotificati
         switch status {
         case .notDetermined, .restricted, .denied:
             print("Location permissions not granted")
-            // Handle this case - maybe prompt user again
         case .authorizedAlways, .authorizedWhenInUse:
             print("Location permissions granted")
         @unknown default:

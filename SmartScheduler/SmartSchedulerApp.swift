@@ -8,6 +8,7 @@
 import SwiftUI
 import MapKit
 import SwiftData
+import UserNotifications
 
 @main
 struct SmartSchedulerApp: App {
@@ -15,8 +16,13 @@ struct SmartSchedulerApp: App {
     init() {
         let schema = Schema([Reminder.self])
         container = try! ModelContainer(for: schema)
-        NotificationManager.instance.requestAuthorization()
-        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("Notification auth error: \(error.localizedDescription)")
+            }
+        }
+        center.delegate = NotificationDelegate.shared
         ViewModel().checkTodayIsHolidayAndNotify()
         let context = container.mainContext
         registerGeofencesForSavedReminders(context: context)

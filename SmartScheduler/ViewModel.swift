@@ -13,6 +13,20 @@ import CoreLocation
 class ViewModel: ObservableObject {
     @Published var reminders: [Reminder] = []
     
+    /// Reminders whose date is now or in the future
+    var upcomingReminders: [Reminder] {
+        reminders
+            .filter { $0.date >= Date() }
+            .sorted { $0.date < $1.date }
+    }
+
+    /// Reminders whose date has passed
+    var oldReminders: [Reminder] {
+        reminders
+            .filter { $0.date < Date() }
+            .sorted { $0.date > $1.date }
+    }
+    
     private var con: ModelContext?
     
     // No-argument initializer to support @StateObject
@@ -37,10 +51,20 @@ class ViewModel: ObservableObject {
         con.insert(newReminder)
         saveContext()
         
-        // Schedule local notification to confirm event creation
-        let notificationTitle = "Smart Scheduler"
-        let notificationBody = "REMINDER: \(title)\n\(desc)"
-        NotificationManager.instance.scheduleNotification(title: notificationTitle, body: notificationBody)
+        // Schedule a time-based notification
+        NotificationManager.instance.scheduleTimedNotification(for: newReminder)
+
+        let fmtDate = DateFormatter.localizedString(
+            from: date,
+            dateStyle: .short,
+            timeStyle: .short
+        )
+        NotificationManager.instance.scheduleImmediateNotification(
+            title: "Reminder Created",
+            body: "\(title) set for \(fmtDate)"
+        )
+        // Start monitoring the reminder’s location
+        NotificationManager.instance.scheduleGeofenceNotification(for: newReminder)
     }
     
     func deleteTask(reminder: Reminder) {
@@ -71,7 +95,7 @@ class ViewModel: ObservableObject {
             let today = ISO8601DateFormatter().string(from: Date()).prefix(10)
             //let today = "2025-07-04" //this line is for testing
             if let holiday = holidays.first(where: { $0.date == today }) {
-                NotificationManager.instance.scheduleNotification(
+                NotificationManager.instance.scheduleImmediateNotification(
                     title: "Today is a holiday!!",
                     body: "\(holiday.localName) is today!"
                 )
